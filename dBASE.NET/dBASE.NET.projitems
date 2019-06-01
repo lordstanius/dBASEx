@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>1441fec5-5683-40e3-b437-1747c452db47</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>dBASE.NET</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\BigEndianBitConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\EndianBitConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\Endianness.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\LittleEndianBitConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dbf.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dbf3Header.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DbfField.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DbfFieldType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DbfHeader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DbfMemo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DbfMemoEntry.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DbfRecord.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DbfVersion.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Encoders\CharacterEncoder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Encoders\CurrencyEncoder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Encoders\DateEncoder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Encoders\DateTimeEncoder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Encoders\DoubleEncoder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Encoders\Encoder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Encoders\FloatEncoder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Encoders\IntegerEncoder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Encoders\LogicalEncoder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Encoders\MemoEncoder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Encoders\NullFlagsEncoder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Encoders\NumericEncoder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tools\DbfDiff.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)LICENSE" />
+  </ItemGroup>
+</Project>

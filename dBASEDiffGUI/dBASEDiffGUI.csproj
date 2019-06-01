@@ -37,6 +37,9 @@
   <PropertyGroup>
     <ApplicationIcon>data_copy.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -94,12 +97,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\dBASE.NET\dBASE.NET\dBASE.NET.csproj">
-      <Project>{6d931bbd-e331-4a20-90e8-ff7bb2a46e8f}</Project>
-      <Name>dBASE.NET</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\Run_16x.png" />
   </ItemGroup>
   <ItemGroup>
@@ -115,7 +112,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="data_copy.ico" />
+    <None Include="Resources\ApplyCodeChanges_16x.png" />
     <None Include="Resources\OpenFolder_16x.png" />
   </ItemGroup>
+  <Import Project="..\dBASE.NET\dBASE.NET.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>$(SolutionDir)ilmerge.exe /out:dBASEDiff.exe $(TargetDir)$(TargetFileName) $(TargetDir)ionic.zip.dll</PostBuildEvent>
+  </PropertyGroup>
 </Project>

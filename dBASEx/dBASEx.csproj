@@ -43,13 +43,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\dBASE.NET\dBASE.NET\dBASE.NET.csproj">
-      <Project>{6d931bbd-e331-4a20-90e8-ff7bb2a46e8f}</Project>
-      <Name>dBASE.NET</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="app.config" />
   </ItemGroup>
+  <Import Project="..\dBASE.NET\dBASE.NET.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
@@ -12,11 +13,14 @@ namespace dBASEDiffGUI
 {
     public class DiffHandler
     {
-        private readonly List<Pair> _trackedFiles = new List<Pair>();
+        private readonly List<PathPair> _trackedFiles = new List<PathPair>();
+        private readonly List<DiffEntry> _diffs = new List<DiffEntry>();
         private readonly string _tempPath = Path.Combine(Path.GetTempPath(), "dBASE_Diff_Files");
         private readonly string _zipPath = Path.Combine(Path.GetTempPath(), "diffs.zip");
 
         public bool IsTracking { get; set; }
+
+        public string[] Paths => _diffs.Select(d => d.Path).ToArray();
 
         public void Enumerate(string path)
         {
@@ -39,7 +43,7 @@ namespace dBASEDiffGUI
                 if (File.Exists(memoPath))
                     File.Copy(memoPath, Path.ChangeExtension(copyOfPath, "FPT"));
 
-                _trackedFiles.Add(new Pair(copyOfPath, originalFile));
+                _trackedFiles.Add(new PathPair(copyOfPath, originalFile));
             }
         }
 
@@ -62,18 +66,52 @@ namespace dBASEDiffGUI
                 Body = body,
             })
             {
-                message.Attachments.Add(new Attachment(CreateDiffResult()));
+                CreateDiffResult();
+                message.Attachments.Add(new Attachment(_zipPath));
                 smtp.Send(message);
             }
         }
 
-        public string CreateDiffResult()
+        public void LoadDiffs(string fileName)
+        {
+            _diffs.Clear();
+            using (var zip = ZipFile.Read(fileName))
+            {
+                foreach (var entry in zip.Entries)
+                {
+                    using (var stream = new MemoryStream())
+                    {
+                        entry.Extract(stream);
+                        stream.Seek(0, SeekOrigin.Begin);
+                        
+                        using (var reader = new StreamReader(stream))
+                        {
+                            var diff = new DiffEntry(reader.ReadLine(), reader.ReadToEnd());
+                            _diffs.Add(diff);
+                        }
+                    }
+                }
+            }
+        }
+
+        public void ApplyDiffs()
+        {
+            _diffs.ForEach(d => d.Apply());
+        }
+
+        public void SaveResult(string fileName)
+        {
+            CreateDiffResult();
+            File.Copy(_zipPath, fileName, true);
+        }
+
+        public void CreateDiffResult()
         {
             File.Delete(_zipPath);
             using (var zip = new ZipFile(_zipPath))
             {
                 zip.CompressionLevel = Ionic.Zlib.CompressionLevel.BestCompression;
-                foreach (Pair pair in _trackedFiles)
+                foreach (PathPair pair in _trackedFiles)
                 {
                     string content = pair.CreateDiff();
                     string diffPath = pair.Original + ".diff";
@@ -83,8 +121,6 @@ namespace dBASEDiffGUI
 
                 zip.Save();
             }
-
-            return _zipPath;
         }
 
         public void Cleanup()
@@ -94,9 +130,9 @@ namespace dBASEDiffGUI
                 Directory.Delete(_tempPath, true);
         }
 
-        class Pair
+        private class PathPair
         {
-            public Pair(string pathToOriginal, string pathToModified)
+            public PathPair(string pathToOriginal, string pathToModified)
             {
                 Original = pathToOriginal;
                 Modified = pathToModified;
@@ -111,6 +147,31 @@ namespace dBASEDiffGUI
                 var diff = new DbfDiff(new Dbf(Original, encoding), new Dbf(Modified, encoding));
 
                 return diff.Serialize();
+            }
+        }
+
+        private class DiffEntry
+        {
+            private readonly string _serializedDiff;
+
+            public DiffEntry(string path, string serializedDiff)
+            {
+                Path = path;
+                _serializedDiff = serializedDiff;
+            }
+
+            public string Path { get; }
+
+            public void Apply()
+            {
+                if (!File.Exists(Path))
+                    return;
+
+                var dbf = new Dbf(Path, Encoding.GetEncoding(1252));
+                var diff = DbfDiff.Deserialize(dbf.Fields, _serializedDiff);
+
+                diff.ApplyTo(dbf);
+                dbf.Save();
             }
         }
     }

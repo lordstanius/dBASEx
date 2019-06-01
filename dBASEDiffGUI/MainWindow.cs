@@ -59,45 +59,38 @@ namespace dBASEDiffGUI
             btnStartTracking.Text = "Start tracking";
             btnStartTracking.Image = Properties.Resources.Run_16x;
 
-            using (var input = new EmailInput())
-            {
-                input.Owner = this;
-                try
-                {
-                    if (input.ShowDialog() != DialogResult.OK)
-                        return;
+            if (dlgSave.ShowDialog() == DialogResult.OK)
+                _diff.SaveResult(dlgSave.FileName);
 
-                    Cursor = Cursors.WaitCursor;
-
-                    _diff.SendResult(input.txtEmail.Text, input.txtPass.Text);
-
-                    MessageBox.Show(
-                        $"Result sent to {input.txtEmail.Text}",
-                        "Success!",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Information
-                    );
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(
-                        ex.Message,
-                        "Sending result failed with exception:",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Exclamation
-                    );
-                }
-                finally
-                {
-                    Cursor = Cursors.Default;
-                    _diff.Cleanup();
-                }
-            }
+            _diff.Cleanup();
         }
 
         private void MainWindow_FormClosed(object sender, FormClosedEventArgs e)
         {
             _diff.Cleanup();
+        }
+
+        private void BtnLoad_Click(object sender, EventArgs e)
+        {
+            lbPaths.Items.Clear();
+            if (dlgOpen.ShowDialog() == DialogResult.OK)
+            {
+                _diff.LoadDiffs(dlgOpen.FileName);
+                lbPaths.Items.AddRange(_diff.Paths);
+
+                btnApply.Enabled = true;
+            }
+        }
+
+        private void BtnApply_Click(object sender, EventArgs e)
+        {
+            btnApply.Enabled = false;
+            Cursor = Cursors.WaitCursor;
+
+            _diff.ApplyDiffs();
+            lbPaths.Items.Clear();
+
+            Cursor = Cursors.Default;
         }
     }
 }
